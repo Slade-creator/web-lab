@@ -6,17 +6,27 @@ interface Registration {
 }
 
 const form = document.getElementById("regForm") as HTMLFormElement;
-const msg = document.getElementById("message") as HTMLParagraphElement;
+const dialog = document.getElementById("successDialog") as HTMLDialogElement;
+const dialogText = document.getElementById("dialogText") as HTMLElement;
+const dialogClose = document.getElementById("dialogClose") as HTMLButtonElement;
 
-form.addEventListener("submit", (e) => {
-    e.preventDefault(); // stop page reload
+function getInputValue(id: string): string {
+    return (document.getElementById(id) as HTMLInputElement).value.trim();
+}
+
+form.addEventListener("submit", (e: Event) => {
+    e.preventDefault(); // this stops the default form submision action
+
     const reg: Registration = {
-        name: (document.getElementById("name") as HTMLInputElement).value,
-        studentId: (document.getElementById("StudentId") as HTMLInputElement).value,
-        program: (document.getElementById("program") as HTMLInputElement).value,
-        course: (document.getElementById("course") as HTMLInputElement).value,
+        name: getInputValue("name"),
+        studentId: getInputValue("StudentId"),
+        program: getInputValue("program"),
+        course: getInputValue("course"),
     };
 
-    msg.textContent =  `Course ${reg.course} added for ${reg.name}!`
-    form.reset()
-})
+    dialogText.textContent = `Course ${reg.course} added for ${reg.name}!`;
+    dialog.showModal();
+    form.reset();
+});
+
+dialogClose.addEventListener("click", () => dialog.close());

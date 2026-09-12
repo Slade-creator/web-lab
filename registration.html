@@ -1,32 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Course Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <header><h1>Course Registration</h1></header>
-        <form id="regForm">
-            <div>
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div>
-                <label for="StudentId">Student ID:</label>
-                <input type="text" id="StudentId" name="StudentId" required>
-            </div>
-            <div>
-                <label for="program">Program:</label>
-                <input type="text" id="program" name="program" required>
-            </div>
-            <div>
-                <label for="course">Course name:</label>
-                <input type="text" id="course" name="course" required><br><br>
-            </div>
+        <main class="container">
+            <header>
+                <h1>Course Registration</h1>
+                <p>Fill in your details to register for a course</p>
+            </header>
+            <section>
+                <form id="regForm">
+                    <fieldset>
+                        <legend>Student Details</legend>
+                    <div>
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required autocomplete="name" placeholder="e.g. Alex Banda">
+                    </div>
+                    <div>
+                        <label for="StudentId">Student ID:</label>
+                        <input type="text" id="StudentId" name="StudentId" required placeholder="e.g. STU-2024-001">
+                    </div>
+                    <div>
+                        <label for="program">Program:</label>
+                        <input type="text" id="program" name="program" required placeholder="e.g. BSc Computer Science">
+                    </div>
+                    <div>
+                        <label for="course">Course name:</label>
+                        <input type="text" id="course" name="course" required placeholder="e.g. Web Development">
+                    </div>
+                    </fieldset>
 
-            <button type="submit">Submit</button>
-        </form>
-        <p id="message"></p>
+                    <button type="submit">Submit</button>
+                </form>
+            </section>
+        </main>
+
+        <dialog id="successDialog" closedby="any" aria-labelledby="dialogTitle" aria-describedby="dialogText">
+            <div class="dialog-body">
+                <svg class="check-mark" viewBox="0 0 52 52" width="72" height="72" aria-hidden="true">
+                    <circle class="check-mark-circle" cx="26" cy="26" r="24" fill="none"/>
+                    <path class="check-mark-tick" fill="none" d="M14 27l8 8 16-17"/>
+                </svg>
+                <h2 id="dialogTitle">Success!</h2>
+                <p id="dialogText"></p>
+                <button type="button" id="dialogClose" class="dialog-btn">Great, continue</button>
+            </div>
+        </dialog>
+        
         <script src="script.js" defer></script>
     </body>
 </html>
