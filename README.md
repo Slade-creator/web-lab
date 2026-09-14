@@ -1,6 +1,5 @@
 # ICT 461 Labs
 
-Lab exercises for ICT 461, collected in one repository. Each lab lives in its own top-level folder.
 
 ## Labs
 
