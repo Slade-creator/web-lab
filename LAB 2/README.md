@@ -1,6 +1,6 @@
 # LAB 2 — Inspect a live page in 5 minutes
 
-DevTools inspection practical. No code is written for this lab; the deliverable is the evidence below and a one-paragraph diagnosis.
+DevTools inspection practical. No code is written for this lab; the deliverable is the screenshot evidence below and a one-paragraph diagnosis.
 
 ## Objective
 
@@ -15,14 +15,14 @@ Open a page you use often and use the browser DevTools to inspect it:
 
 | | |
 |---|---|
-| URL | <https://github.com/> |
-| Title | GitHub · Change is constant. GitHub keeps you ahead. |
-| Browser | Chromium (Playwright), viewport 1280 × 800 |
-| Date | 15 Sep 2026 |
+| URL | <https://github.com/> (heading, button, images, network) |
+| URL | <https://github.com/login> (form field) |
+| Browser | Google Chrome — DevTools, Elements and Network panels |
+| Date | 16 Sep 2026 |
 
 ## Method
 
-Opened the live GitHub home page, inspected the DOM for a heading, button and form field, read every `<img>` element's `alt` attribute, then reloaded the page and read the resource timings to find the slowest request.
+Opened GitHub in Chrome, used the Elements panel's element picker to select a heading, a button, a form field and an image, and read each element's Accessibility info (name and role). Opened the Network panel and reloaded the page, then read the request table to find the slowest request.
 
 ## Findings
 
@@ -31,8 +31,14 @@ Opened the live GitHub home page, inspected the DOM for a heading, button and fo
 | Property | Value |
 |---|---|
 | Tag | `h1` |
+| `id` | `hero-section-brand-heading` |
 | Text | "The future of building happens together" |
-| Notes | A single `h1` per page, matching the hero's main message. Carries Primer brand heading classes. |
+| Accessible name | "The future of building happens together" |
+| Role | `heading` |
+
+A single `h1` carrying the hero's main message, so the page has one clear top-level heading.
+
+![Heading inspected in the Elements panel](assets/elements-heading.png)
 
 ### Button
 
@@ -40,26 +46,34 @@ Opened the live GitHub home page, inspected the DOM for a heading, button and fo
 |---|---|
 | Tag | `button` |
 | Accessible name | "Sign up for GitHub" |
+| Role | `button` |
 | Type | `submit` |
-| Notes | Has a visible text label, so no `aria-label` is needed. A separate `Sign in` link (`a href="/login"`) sits in the header. |
+| Form | `action="/signup"`, `method="get"`, `aria-label="Sign up for GitHub"` |
+
+The button has a visible text label, so it is announced correctly without needing its own `aria-label`.
+
+![Button inspected in the Elements panel](assets/elements-button.png)
 
 ### Form field
 
 | Property | Value |
 |---|---|
-| Tag | `input` |
-| Type | `email` |
-| `id` / `name` | `hero_user_email` / `user_email` |
-| Placeholder | `you@domain.com` |
-| `autocomplete` | `email` |
-| Label | "Enter your email" (`label[for="hero_user_email"]`) |
-| Form | `action="/signup"`, `method="get"` |
+| Page | <https://github.com/login> |
+| Tag | `input#login_field.form-control.js-login-field` |
+| Type | `text` |
+| `name` | `login` |
+| Label | "Username or email address" (`label[for="login_field"]`) |
+| Accessible name / role | "Username or email address" / `textbox` |
+| Other attributes | `required`, `autocomplete="username"`, `autofocus` |
+| Form | `action="/session"`, `method="post"` |
 
-The field is programmatically labelled, uses a semantic `type="email"` (so the browser validates it) and hints `autocomplete="email"` for autofill.
+The field is programmatically labelled, marked `required`, and hints `autocomplete="username"` so password managers and autofill can populate it.
+
+![Form field inspected in the Elements panel](assets/elements-form-field.png)
 
 ### Image alternative text
 
-24 `<img>` elements on the page. Every one has an `alt` attribute. Representative sample:
+The homepage has 24 `<img>` elements and every one carries an `alt` attribute. Representative sample:
 
 | Image | `alt` | Verdict |
 |---|---|---|
@@ -68,38 +82,42 @@ The field is programmatically labelled, uses a semantic `type="email"` (so the b
 | `logo-gartner.svg` | `"Gartner"` | Correct. |
 | `hero-*.webp` (product shot) | "Copilot Autofix identifies vulnerable code and provides an explanation…" | Correct — long, descriptive alt for a meaningful image. |
 | `pillar-1/2/3-*.webp` | Descriptive sentences about each feature | Correct. |
-| `accordion-1..4.webp` | `""` (empty) | Acceptable — decorative illustrations beside visible text. |
-| Partner logos (`figma.svg`, `mercedes-benz.svg`, `mercado-libre.svg`) | `""` (empty) | Borderline — if these logos carry meaning they should be named; empty `alt` is fine only if the surrounding text already conveys them. |
+| `accordion-1..4.webp` | `""` (empty) | Correct — decorative illustrations beside visible text. |
+| Partner logos (`figma.svg`, `mercedes-benz.svg`, `mercado-libre.svg`) | `""` (empty) | Borderline — fine only if the surrounding text already conveys them. |
+
+The screenshot below shows the `accordion-1-*.webp` image selected: its `alt=""` is empty and its accessible name is blank, which is the right call for a decorative image (it also uses `loading="lazy"`).
+
+![Image alt attribute inspected in the Elements panel](assets/elements-image-alt.png)
 
 Overall: alt handling is strong. Decorative images are correctly hidden, logos and content images are named, and no image is missing the attribute.
 
 ### Network — slowest request
 
-Reload result: 159 requests, TTFB ≈ 673 ms, DOMContentLoaded ≈ 3.9 s, load ≈ 3.9 s, HTML ≈ 118 KB.
+Reload result (Network panel): **164 requests**, 217 kB transferred, 13.4 MB resources, DOMContentLoaded 8.48 s, Load 16.32 s.
 
 | Metric | Slowest request |
 |---|---|
-| Resource | `code-1_desktop-6d44c7cb53b4aebb.mp4` |
-| Type | `video` |
-| Size | 218,922 bytes (~219 KB) |
-| Time | ≈ 3.29 s |
-| Started at | ≈ 4.0 s after navigation |
+| Resource | `fs-99c4238c14ea84ec.js` |
+| Type | `script` (JavaScript module chunk) |
+| Size | 88.5 kB |
+| Time | 4.16 s |
+| Initiator | module chunk loading |
 
-The slowest request is the hero **product demo video** (`code-1_desktop-*.mp4`, ~219 KB). It is the single largest payload downloaded on reload and finishes last, so it dominates the end of the load timeline. On a cold (uncached) first load the largest request instead is the `landing-pages-*.js` bundle (~508 KB), showing that GitHub ships a large amount of JavaScript alongside the media.
+The slowest request in the capture is a **JavaScript module chunk** (`fs-99c4238c14ea84ec.js`, ~88.5 kB, 4.16 s). It is a lazily-loaded script bundle pulled in by GitHub's module loader, and it is the longest download in the table — the next slowest requests (`web` at 1.84 s, a `collect` beacon at 1.79 s) are less than half its time. Notably the large media assets on the page — the `code-1_desktop-*.mp4` video and the `.glb` 3D models — report near-zero times because they were served from the browser's disk cache on this reload, so they did not compete with the script for network time.
+
+![Network panel after reload](assets/network-panel.png)
 
 ## Diagnosis
 
-GitHub's home page is well engineered for accessibility: it uses one semantic `h1`, a properly labelled email `input` with `type="email"` and `autocomplete`, a `button` with a real text label, and it gives every image an `alt` attribute — decorative images are correctly hidden with `alt=""` while logos and product screenshots are described. The performance story is the more interesting one: after a reload the slowest request is the ~219 KB hero demo **video**, which lands last and extends the load event, and on a cold load the heaviest item is a ~508 KB JavaScript bundle. In short, the page is accessible by default but media- and JavaScript-heavy, so the biggest wins would come from lazy-loading or trimming the hero video and splitting the JS bundle.
-
-## Evidence
-
-GitHub home page as inspected (hero heading, email field, and "Sign up for GitHub" button visible):
-
-![GitHub home page](assets/github-home.png)
+GitHub's pages are well engineered for accessibility: the homepage uses a single semantic `h1` with a clear accessible name, the "Sign up for GitHub" button has a real text label, the login form field is properly labelled, `required`, and hints `autocomplete="username"`, and every image has an `alt` attribute — decorative images are correctly hidden with `alt=""` while logos and product screenshots are described. The performance picture is dominated by JavaScript rather than media: on a reload the slowest request is the ~88.5 kB `fs-*.js` module chunk at 4.16 s, while the large video and 3D assets load from cache and cost almost nothing. The takeaway is that GitHub's accessibility is solid by default, and its remaining load-time cost comes from many small, lazily-loaded script chunks rather than from images or video.
 
 ## Files
 
 | File | Purpose |
 |---|---|
 | `README.md` | This report — findings and diagnosis |
-| `assets/github-home.png` | Screenshot of the inspected page |
+| `assets/elements-heading.png` | Elements panel: the `h1` heading |
+| `assets/elements-button.png` | Elements panel: the "Sign up for GitHub" button |
+| `assets/elements-form-field.png` | Elements panel: the login form field |
+| `assets/elements-image-alt.png` | Elements panel: an image's `alt` attribute |
+| `assets/network-panel.png` | Network panel after reload |
