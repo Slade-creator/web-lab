@@ -1,4 +1,3 @@
-"use strict";
 const form = document.getElementById("regForm");
 const dialog = document.getElementById("successDialog");
 const dialogText = document.getElementById("dialogText");
@@ -7,7 +6,7 @@ function getInputValue(id) {
     return document.getElementById(id).value.trim();
 }
 form.addEventListener("submit", (e) => {
-    e.preventDefault(); // this handler only runs after native validation passes
+    e.preventDefault(); // this stops the default form submision action
     const reg = {
         name: getInputValue("name"),
         studentId: getInputValue("StudentId"),
