@@ -23,6 +23,7 @@ If a task needed no AI involvement, it has no entry here (equivalent to "No AI u
 |---|------|------|--------------|------------------|
 | 1 | 2026-09-21 | Documentation / lab setup | Yes | Created this log; renamed plan `api_use.md` → `AI-use.md`; flagged an `api.js` naming collision to fix ourselves |
 | 2 | 2026-09-21 | Task 2 — Express endpoints (concepts) | Yes | Explained endpoint anatomy, status-code mapping and Windows cURL testing; code still ours to write and test |
+| 3 | 2026-09-21 | Task 2 — GET /api/registrations/:id | Yes | Reviewed our first attempt after it failed; two fixes (plural path, req.params.id); full predict → fail → diagnose → pass arc recorded |
 
 ## Entries
 
@@ -137,6 +138,71 @@ and mangles JSON flags — use `curl.exe -i` to see the status line and headers.
 - [Complete in your own words after your first endpoint works. Sentence starters:
   what surprised you about `req.params` being strings, why the body-parser middleware
   order matters, or what `-i` revealed in the response.]
+
+---
+
+### Entry 3 — 2026-09-21 — Task 2: GET /api/registrations/:id (failed first, then passed)
+
+**Task / stage:** Second endpoint, our own first attempt (fill-in-the-blank coaching;
+we typed all handler code). Committed base: `3ccfb07` (GET /api/courses).
+
+**Prompt (verbatim):**
+
+> let move to the next one
+> check my code
+> [pasted startup console showing `ReferenceError: id is not defined ... at server.js:20:51`]
+> explain this
+
+**First attempt and its recorded failures (real, ours):**
+
+1. Attempt 1 both curls returned Express's built-in HTML 404
+   (`Cannot GET /api/registrations/reg_1`, `Content-Security-Policy: default-src 'none'`).
+   Predicted: our JSON 404. Actual: HTML 404. Diagnosis: our handler never ran —
+   the route had not matched.
+2. AI review of our code found two bugs (allowed now: fix after recorded first attempt):
+   - **server.js:19** — path was singular `/api/registration/:id`; lab requires plural
+     `registrations`, and our curl used plural. We fixed the path.
+   - **server.js:20** — compared `r.id === id` but `id` was never defined; the URL
+     param lives in `req.params.id`. We fixed the expression.
+3. After fixing only the path, the server console showed
+   `ReferenceError: id is not defined at server.js:20:51` — bug 2 surfacing as a
+   500 for the client while the process kept listening (Express catches handler
+   errors). We learned to read the stack trace top-down (throw site) and bottom-up
+   (how the request arrived through Router → Route → Layer).
+
+**Suggestion used:**
+
+- Fix route path pluralisation; use `req.params.id`; both typed by us.
+
+**Suggestion rejected:** none.
+
+**Test / verification (final, real output):**
+
+```
+$ curl.exe -i http://localhost:3000/api/registrations/reg_1
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 119
+ETag: W/"77-4VaUQUepKFGRh159Rxa64wgMrtE"
+
+{"id":"reg_1","studentId":"202308647","name":"Elton chiwala","programme":"BSc Computer Science","courseCode":"ICT461"}
+
+$ curl.exe -i http://localhost:3000/api/registrations/nope
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+Content-Length: 29
+
+{"error":"Student not found"}
+```
+
+Both responses are now ours: JSON content type, our error body. Unknown-ID 404
+matches the lab table; known-ID 200 returns one record.
+
+**What we learned:**
+
+- [Complete in your own words — the full arc is: predicted → got Express's HTML
+  404 → fixed route path → got a 500 ReferenceError we had to read in a stack
+  trace → fixed req.params.id → 200 + JSON 404. What surprised you most?]
 
 ---
 
