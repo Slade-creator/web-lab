@@ -24,6 +24,7 @@ If a task needed no AI involvement, it has no entry here (equivalent to "No AI u
 | 1 | 2026-09-21 | Documentation / lab setup | Yes | Created this log; renamed plan `api_use.md` → `AI-use.md`; flagged an `api.js` naming collision to fix ourselves |
 | 2 | 2026-09-21 | Task 2 — Express endpoints (concepts) | Yes | Explained endpoint anatomy, status-code mapping and Windows cURL testing; code still ours to write and test |
 | 3 | 2026-09-21 | Task 2 — GET /api/registrations/:id | Yes | Reviewed our first attempt after it failed; two fixes (plural path, req.params.id); full predict → fail → diagnose → pass arc recorded |
+| 4 | 2026-09-21 | Task 2 — POST /api/registrations | Yes | 201 + Location, 409 duplicate, 400 invalid all pass; failures taught server restart, express.json() call parentheses, and PowerShell/cURL quoting boundaries |
 
 ## Entries
 
@@ -203,6 +204,86 @@ matches the lab table; known-ID 200 returns one record.
 - [Complete in your own words — the full arc is: predicted → got Express's HTML
   404 → fixed route path → got a 500 ReferenceError we had to read in a stack
   trace → fixed req.params.id → 200 + JSON 404. What surprised you most?]
+
+---
+
+### Entry 4 — 2026-09-21 — Task 2: POST /api/registrations (201 / 400 / 409)
+
+**Task / stage:** Third endpoint, our own code (fill-in-the-blank coaching). Added
+`app.use(express.json())` and the POST handler with three exits: validate → 400,
+duplicate check → 409, create → 201 + `Location`.
+
+**Prompt (verbatim):**
+
+> lets move
+> [pasted a failing POST run: Express HTML 404 `Cannot POST` plus curl errors
+> "Could not resolve host: Computer" and "unmatched close brace/bracket"]
+> [pasted `SyntaxError: Expected property name or '}' in JSON at position 1`]
+> [pasted passing outputs for 201, GET reg_3, 409, 400]
+
+**First attempt and its recorded failures (real, ours):**
+
+1. `Cannot POST /api/registrations` (HTML 404) — route was in the file but the
+   running process predated it. Lesson: Node loads the file once at startup; edits
+   need `Ctrl+C` + `node server.js`.
+2. Code review found **server.js:4** `app.use(express.json)` — we passed the
+   factory function without calling it. `express.json` is a factory: calling it
+   *produces* the middleware. Missing `()` means no request body is ever parsed.
+3. cURL/PowerShell boundary, two failures:
+   - `-d '{\"...\"}'` — PowerShell 5.1 split the JSON at spaces inside
+     `"BSc Computer Science"`, so curl treated `Computer` as a hostname and the
+     JSON tail as extra arguments. Content never arrived intact.
+   - Backtick-quoted variant got its quotes eaten too: server received
+     `{name:Test Banda,...}` (unquoted keys) → **Express's own** malformed-JSON
+     400 (HTML, `SyntaxError` at position 1, body-parser stack trace).
+   - Fix: JSON payloads in files (`body.json`, `body_bad.json`), sent with
+     `-d "@body.json"`. Committed as reusable test fixtures.
+4. Nuance learned by evidence: our API now has **two different 400s** — Express's
+   automatic 400 for malformed JSON (HTML) and our 400 for invalid-but-parsed data
+   (our JSON error message). Same code, different layer.
+
+**Suggestion used:**
+
+- Call `express.json()`; restart after edits; use `@file` payloads; make test
+  payload keys match our field names. All typed and run by us.
+
+**Suggestion rejected:** none.
+
+**Design decision (ours):** we renamed the field `courseCode` → `courseName`
+server-side. TODO before Task 1.3: the form's `app.js` currently sends
+`program`/`course` — align one vocabulary across form and API, otherwise POSTs
+from the browser arrive half-empty.
+
+**Test / verification (real output, 2026-09-21 17:23–17:46):**
+
+```
+# 1. valid create → 201 + Location + record
+HTTP/1.1 201 Created
+Location: /api/registrations/reg_3
+{"id":"reg_3","name":"Test Banda","studentId":"202309999","programme":"BSc Computer Science","courseName":"Cloud Computing"}
+
+# 2. round trip: created record is readable
+$ curl.exe -i http://localhost:3000/api/registrations/reg_3
+HTTP/1.1 200 OK ... same body
+
+# 3. identical POST repeated → 409, our JSON error
+HTTP/1.1 409 Conflict
+{"error":"Student already registered for the course"}
+
+# 4. missing studentId → 400, our JSON error
+HTTP/1.1 400 Bad Request
+{"error":"invalid data"}
+```
+
+The 201→409 pair on identical requests is our recorded evidence for the Task 2.1
+question: POST is not idempotent — same request, different intended server effect.
+
+**What we learned:**
+
+- [Complete in your own words — candidate themes: why server-side validation
+  exists even when the form validates too (Checkpoint A: browser → web server →
+  application → data store), the factory-function middleware concept, the
+  PowerShell quoting boundary, non-idempotent POST.]
 
 ---
 
