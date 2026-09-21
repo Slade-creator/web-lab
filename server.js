@@ -3,6 +3,16 @@ const app = express()
 
 app.use(express.json())
 
+app.use((req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "http://localhost:5500");
+    res.set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+    next();
+});
+
 const course = [
     { code: "ICT 461", name: "Web Application Development" },
     { code: "ICT 411", name: "Cloud Computing" }
@@ -48,7 +58,7 @@ app.put("/api/registrations/:id", (req, res) => {
     const reg = registration.find((r) => r.id === req.params.id);
 
     if (!reg) {
-        return res.status(404).json({ error: "unkown id"})
+        return res.status(404).json({ error: "unknown id"})
     }
 
     const { name, studentId, programme, courseName } = req.body;
@@ -64,6 +74,36 @@ app.put("/api/registrations/:id", (req, res) => {
 
     res.status(200).json(reg);
 })
+
+app.patch("/api/registrations/:id", (req, res) => {
+    const reg = registration.find((r) => r.id === req.params.id);
+
+    if (!reg) {
+        return res.status(404).json({ error: "unknown id" });
+    }
+
+    const { programme } = req.body;
+
+    if (!programme) {
+        return res.status(400).json({ error: "programme is required and cannot be empty" });
+    }
+
+    reg.programme = programme;
+
+    res.status(200).json(reg);
+});
+
+app.delete("/api/registrations/:id", (req, res) => {
+    const index = registration.findIndex((r) => r.id === req.params.id);
+
+    if (index === -1) {
+        return res.status(404).json({ error: "unknown id" });
+    }
+
+    registration.splice(index, 1);
+
+    res.status(204).end();
+});
 
 app.get('/', (req, res) => {
     res.send('Hello world')

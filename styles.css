@@ -178,6 +178,24 @@ button:focus-visible {
     outline-offset: 2px;
 }
 
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+}
+
+#formFeedback {
+    min-height: 1.2em;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--sage);
+}
+
+#formFeedback.error {
+    color: #a33d20;
+    font-weight: 600;
+}
+
 dialog {
     margin: auto;
     padding: 24px 28px 20px;

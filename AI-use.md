@@ -26,6 +26,7 @@ If a task needed no AI involvement, it has no entry here (equivalent to "No AI u
 | 3 | 2026-09-21 | Task 2 — GET /api/registrations/:id | Yes | Reviewed our first attempt after it failed; two fixes (plural path, req.params.id); full predict → fail → diagnose → pass arc recorded |
 | 4 | 2026-09-21 | Task 2 — POST /api/registrations | Yes | 201 + Location, 409 duplicate, 400 invalid all pass; failures taught server restart, express.json() call parentheses, and PowerShell/cURL quoting boundaries |
 | 5 | 2026-09-21 | Task 2 — PUT /api/registrations/:id | Yes | Full-replace contract passes (200/404/400); restart wiped the memory store (the in-memory lesson); idempotent PUT evidenced by identical ETags |
+| 6 | 2026-09-21 | Task 2 + 1.3 — PATCH, DELETE, UI wiring | Yes | **AI-authored at our request (tired)**; all six routes + form→API flow tested and passing; explain-back checklist must be completed by both of us |
 
 ## Entries
 
@@ -363,6 +364,84 @@ does not run on PUT. Relevant for a real system; out of scope for the prototype.
 - [Complete in your own words — strongest themes: the restart wipe (no data
   store layer), idempotency proven by repeated identical responses/ETags, why
   PUT validates every field, destructive full-replace semantics.]
+
+---
+
+### Entry 6 — 2026-09-21 — PATCH, DELETE and UI wiring (AI-authored, disclosed)
+
+**Task / stage:** End of session. We were tired and asked AI to complete the two
+remaining endpoints and connect the form to the API. **AI wrote the code in this
+entry — it is NOT our first attempt.** Before submission both of us must work
+through the explain-back checklist below; if we cannot explain a line, we redo it
+ourselves.
+
+**Prompt (verbatim):**
+
+> am tired can you complete the two endpoints , and connect it to the ui then test
+
+**What AI wrote (full disclosure):**
+
+- `server.js`: PATCH route (programme-only change; 400 on invalid value; 404),
+  DELETE route (204 no body; 404), manual CORS middleware (exact origin
+  `http://localhost:5500`, allowed methods/headers, 204 for OPTIONS preflight).
+  Also fixed our `"unkown id"` typo.
+- `api.js` (new): fetch helper module — `request()` wrapper that skips JSON
+  parsing on 204 (the lab's rule), throws `data.error` for non-2xx, and
+  `postRegistration()`.
+- `app.js` (rewritten): async submit handler, loading state on the button,
+  success/error feedback, localStorage save + restore of programme preference,
+  payload keys aligned to the server (`programme`/`courseName` — resolves the
+  Entry 4 vocabulary TODO).
+- `index.html`: `<p id="formFeedback" role="status" aria-live="polite">`; CSS for
+  feedback and disabled button.
+- `serve-ui.js` (new): dependency-free static server on port 5500 (lab requires
+  the interface on 5500; a file:// origin would break the cross-port fetch).
+- `package.json`: `npm start` (node --watch server.js), `npm run ui`.
+- Fixtures: `body_patch.json`, `body_patch_empty.json`.
+
+**Test / verification (real, run by AI today, repeatable by us):**
+
+```
+PATCH reg_1 + body_patch.json     → 200, programme changed, name/courseName untouched
+PATCH reg_1, programme ""         → 400 {"error":"programme is required and cannot be empty"}
+PATCH reg_99                      → 404 {"error":"unknown id"}
+DELETE reg_2                      → 204 No Content (no body, no Content-Type/Length/ETag)
+GET reg_2 after delete            → 404
+DELETE reg_2 again                → 404 (delete is idempotent in effect, not status)
+
+Browser (http://localhost:5500, Playwright-driven):
+form submit                       → POST 201 Created → success dialog shown
+same submission again             → POST 409 → "Student already registered for the
+                                    course" shown in the form status area
+full page reload                  → Programme field pre-filled from localStorage
+```
+
+**Issues discovered during testing (ours to decide on):**
+
+1. **ID collision:** after DELETE of `reg_2` + a new POST, the generator
+   `"reg_" + (registration.length + 1)` reissued `reg_2` for a different student.
+   Design note for README: naive ID generation is unsafe after deletions; a
+   monotonic counter or timestamp would fix it (design-only for this prototype).
+2. **favicon.ico 404** in the browser console — cosmetic; add an icon before
+   submission.
+
+**Explain-back checklist (BOTH of us, before submission):**
+
+- [ ] `findIndex` + `splice` vs `find` — why DELETE uses a different lookup
+- [ ] Why 204 must end with no body (`res.status(204).end()`) and why the helper
+      checks `status !== 204` before `.json()`
+- [ ] What the CORS middleware does; why the browser sends an OPTIONS preflight
+      for a cross-origin POST with `Content-Type: application/json`
+- [ ] `async/await` + `try/catch/finally` in the submit handler; what `finally`
+      guarantees
+- [ ] Loading state: why the button is disabled during flight (double-submit)
+- [ ] `role="status"` + `aria-live="polite"` — what they announce to screen readers
+- [ ] localStorage: key, save point, restore point; how sessionStorage would differ
+- [ ] Vocabulary: form now sends `programme`/`courseName` to match the server
+
+**What we learned:**
+
+- [Complete in your own words after walking the checklist.]
 
 ---
 

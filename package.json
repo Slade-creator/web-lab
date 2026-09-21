@@ -4,6 +4,8 @@
   "description": "A simple course registration page built with plain HTML, CSS, and TypeScript. Created as a lab exercise in web fundamentals.",
   "main": "app.js",
   "scripts": {
+    "start": "node --watch server.js",
+    "ui": "node serve-ui.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
