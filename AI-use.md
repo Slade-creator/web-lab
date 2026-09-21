@@ -25,6 +25,7 @@ If a task needed no AI involvement, it has no entry here (equivalent to "No AI u
 | 2 | 2026-09-21 | Task 2 — Express endpoints (concepts) | Yes | Explained endpoint anatomy, status-code mapping and Windows cURL testing; code still ours to write and test |
 | 3 | 2026-09-21 | Task 2 — GET /api/registrations/:id | Yes | Reviewed our first attempt after it failed; two fixes (plural path, req.params.id); full predict → fail → diagnose → pass arc recorded |
 | 4 | 2026-09-21 | Task 2 — POST /api/registrations | Yes | 201 + Location, 409 duplicate, 400 invalid all pass; failures taught server restart, express.json() call parentheses, and PowerShell/cURL quoting boundaries |
+| 5 | 2026-09-21 | Task 2 — PUT /api/registrations/:id | Yes | Full-replace contract passes (200/404/400); restart wiped the memory store (the in-memory lesson); idempotent PUT evidenced by identical ETags |
 
 ## Entries
 
@@ -284,6 +285,84 @@ question: POST is not idempotent — same request, different intended server eff
   exists even when the form validates too (Checkpoint A: browser → web server →
   application → data store), the factory-function middleware concept, the
   PowerShell quoting boundary, non-idempotent POST.]
+
+---
+
+### Entry 5 — 2026-09-21 — Task 2: PUT /api/registrations/:id (full replace)
+
+**Task / stage:** Fourth endpoint, our own code. Concepts taught first (mutation vs
+creation, full-replace semantics, validate-before-mutate), then we typed the handler.
+
+**Prompt (verbatim):**
+
+> lets move
+> // full replace: overwrite each field on the object we found ... i don't understand
+> check the code [pasted `Cannot PUT` HTML 404]
+> [pasted passing 200 / 404 / 400 outputs]
+
+**What AI explained (concepts, allowed pre-attempt):**
+
+- `find()` returns the object itself, not a copy — assigning `reg.name = ...`
+  mutates the record inside the array (locker analogy: POST welds a new locker,
+  PUT swaps a locker's contents; number/`id` stays).
+- PUT = "make this resource exactly like my payload", so a missing field would be
+  *wiped* — that is why every required field must be validated BEFORE the first
+  assignment (no undo).
+- 200 not 201: the resource already existed; 201 means "created", with `Location`
+  pointing at something new.
+
+**First attempt and its recorded failures (real, ours):**
+
+1. `Cannot PUT /api/registrations/reg_3` HTML 404 — third occurrence of the
+   restart class. Systemic fix: `node --watch server.js` (Node's built-in watcher,
+   no new dependency) — saving now auto-restarts.
+2. After restart, PUT to `reg_3` returned **our own 404** — correct behaviour with
+   a deep cause: the restart wiped the in-memory array; `reg_3` existed only in the
+   previous process. This is the lab's "use in-memory records" experienced
+   firsthand: we have no data-store layer, so nothing survives a restart. (Goes in
+   the README decision note.)
+3. PUT over `reg_2` replaced Jane Doe's record with our test payload — full-replace
+   is client-directed and destructive by design. Also observed: our `body_put.json`
+   contained `"Test BandaUpdated"` (missing space) and the server accepted it —
+   our validation checks presence, not quality.
+
+**Suggestion used:**
+
+- Mutate the found object field-by-field; validate every field first; order:
+  404 (unknown id) before 400 (invalid body) — our choice, defended in README.
+- `node --watch` as the permanent fix for the restart class of failures.
+
+**Suggestion rejected:** none.
+
+**Test / verification (real output, 2026-09-21 18:04–18:08):**
+
+```
+# identical PUT twice → 200 both times, IDENTICAL ETag W/"84-..." = content unchanged
+HTTP/1.1 200 OK
+{"id":"reg_2","studentId":"202309999","name":"Test BandaUpdated","programme":"BSc Computer Science","courseName":"Cloud Computing"}
+
+# unknown id → our 404 JSON
+HTTP/1.1 404 Not Found
+{"error":"unkown id"}
+
+# invalid body (missing studentId) → our 400 JSON
+HTTP/1.1 400 Bad Request
+{"error":"invalid"}
+```
+
+Compare with POST's 201→409 pair: PUT is idempotent (200→200), POST is not.
+
+**Design-only note (per lab wording, labelled not implemented):** PUT does not
+guard against creating a duplicate studentId+course combination — our POST 409
+does not run on PUT. Relevant for a real system; out of scope for the prototype.
+
+**TODO:** fix the `"unkown id"` typo (user-facing message).
+
+**What we learned:**
+
+- [Complete in your own words — strongest themes: the restart wipe (no data
+  store layer), idempotency proven by repeated identical responses/ETags, why
+  PUT validates every field, destructive full-replace semantics.]
 
 ---
 

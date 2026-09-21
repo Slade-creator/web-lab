@@ -44,6 +44,27 @@ app.post("/api/registrations", (req, res) => {
     res.status(201).location("/api/registrations/"+ newReg.id).json(newReg)
 })
 
+app.put("/api/registrations/:id", (req, res) => {
+    const reg = registration.find((r) => r.id === req.params.id);
+
+    if (!reg) {
+        return res.status(404).json({ error: "unkown id"})
+    }
+
+    const { name, studentId, programme, courseName } = req.body;
+
+    if (!name || !studentId || !programme || !courseName) {
+        return res.status(400).json({ error: "invalid"})
+    }
+
+    reg.name = req.body.name;
+    reg.studentId = req.body.studentId;
+    reg.programme = req.body.programme;
+    reg.courseName = req.body.courseName;
+
+    res.status(200).json(reg);
+})
+
 app.get('/', (req, res) => {
     res.send('Hello world')
 });
