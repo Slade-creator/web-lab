@@ -1,0 +1,24 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "A simple course registration page built with plain HTML, CSS, and TypeScript. Created as a lab exercise in web fundamentals.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slade-creator/web-lab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Slade-creator/web-lab/issues"
+  },
+  "homepage": "https://github.com/Slade-creator/web-lab#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
