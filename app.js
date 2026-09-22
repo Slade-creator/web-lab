@@ -1,4 +1,4 @@
-import { postRegistration } from "./api.js";
+import { postRegistration, startDemoSession, readDemoSession } from "./api.js";
 
 const form = document.getElementById("regForm");
 const dialog = document.getElementById("successDialog");
@@ -23,10 +23,27 @@ function setBusy(busy) {
     submitButton.textContent = busy ? "Registering..." : "Submit";
 }
 
-const savedProgramme = localStorage.getItem(PROGRAMME_KEY);
-if (savedProgramme) {
-    document.getElementById("program").value = savedProgramme;
+function saveProgrammePreference(programme) {
+    try {
+        localStorage.setItem(PROGRAMME_KEY, programme);
+    } catch {
+        return;
+    }
 }
+
+function restoreProgrammePreference() {
+    try {
+        const saved = localStorage.getItem(PROGRAMME_KEY);
+        if (saved) {
+            document.getElementById("program").value = saved;
+        }
+    } catch {
+        return;
+    }
+}
+
+
+restoreProgrammePreference();
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -43,11 +60,11 @@ form.addEventListener("submit", async (e) => {
 
     try {
         const saved = await postRegistration(reg);
-        localStorage.setItem(PROGRAMME_KEY, reg.programme);
+        saveProgrammePreference(reg.programme);
         dialogText.textContent = `Course ${saved.courseName} added for ${saved.name}!`;
         dialog.showModal();
         form.reset();
-        document.getElementById("program").value = reg.programme;
+        restoreProgrammePreference();
         showFeedback(`Registration saved as ${saved.id}.`, false);
     } catch (err) {
         showFeedback(err.message, true);
@@ -57,3 +74,24 @@ form.addEventListener("submit", async (e) => {
 });
 
 dialogClose.addEventListener("click", () => dialog.close());
+
+const cookieSetButton = document.getElementById("cookieSet");
+const cookieReadButton = document.getElementById("cookieRead");
+const cookieOutput = document.getElementById("cookieOutput");
+
+async function runCookieStep(button, action) {
+    button.disabled = true;
+    cookieOutput.textContent = "Working...";
+
+    try {
+        const result = await action();
+        cookieOutput.textContent = JSON.stringify(result, null, 2);
+    } catch (err) {
+        cookieOutput.textContent = err.message;
+    } finally {
+        button.disabled = false;
+    }
+}
+
+cookieSetButton.addEventListener("click", () => runCookieStep(cookieSetButton, startDemoSession));
+cookieReadButton.addEventListener("click", () => runCookieStep(cookieReadButton, readDemoSession));

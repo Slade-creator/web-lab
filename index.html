@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
     </head>
     <body>
@@ -49,6 +50,18 @@
                     <button type="submit">Submit</button>
                     <p id="formFeedback" role="status" aria-live="polite"></p>
                 </form>
+            </section>
+
+            <section id="diagnostics" aria-labelledby="diagnostics-heading">
+                <h2 id="diagnostics-heading">Lab diagnostics — cookie demo</h2>
+                <p>Not a login system. Sets a non-sensitive <code>demoSession</code> cookie, then sends it
+                   back. Watch both requests in DevTools ▸ Network, and the stored cookie in
+                   Application ▸ Cookies.</p>
+                <div class="diagnostics-actions">
+                    <button type="button" id="cookieSet">1. Set demo cookie</button>
+                    <button type="button" id="cookieRead">2. Send it back</button>
+                </div>
+                <pre id="cookieOutput" role="status" aria-live="polite">No request sent yet.</pre>
             </section>
         </main>
 

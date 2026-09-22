@@ -196,6 +196,69 @@ button:disabled {
     font-weight: 600;
 }
 
+/* Lab diagnostics — cookie demo (Task 4.1) */
+#diagnostics {
+    margin-top: 28px;
+}
+
+#diagnostics h2 {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+#diagnostics p {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+#diagnostics code {
+    font-size: 0.82rem;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    padding: 1px 5px;
+    border-radius: 5px;
+}
+
+.diagnostics-actions {
+    display: flex;
+    gap: 10px;
+    margin: 16px 0 12px;
+}
+
+.diagnostics-actions button {
+    flex: 1 1 0;
+    width: auto;
+    padding: 10px;
+    font-size: 0.82rem;
+    background: var(--sage);
+    box-shadow: none;
+}
+
+.diagnostics-actions button:hover {
+    background: #5d7749;
+    transform: none;
+    box-shadow: none;
+}
+
+#cookieOutput {
+    margin: 0;
+    padding: 10px 12px;
+    min-height: 3em;
+    max-height: 190px;
+    overflow: auto;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 dialog {
     margin: auto;
     padding: 24px 28px 20px;

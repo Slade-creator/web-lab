@@ -22,3 +22,16 @@ export function postRegistration(reg) {
         body: JSON.stringify(reg),
     });
 }
+
+export function startDemoSession() {
+    return request("/api/demo/session", {
+        method: "POST",
+        credentials: "include",
+    });
+}
+
+export function readDemoSession() {
+    return request("/api/demo/session", {
+        credentials: "include",
+    });
+}
