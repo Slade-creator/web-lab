@@ -432,10 +432,16 @@ actually negotiates:
 
 ### Evidence to capture (Task 1.2)
 
+We captured both layouts. **Both predate the diagnostics panel, so re-shoot them
+before submission** — the submitted screenshots must match the submitted code.
+
+![360px layout](assets/layout-360.png)
+![1366px layout](assets/layout-1366.png)
+
 | Check | Expected | Observed |
 |---|---|---|
-| 360px layout screenshot | single column, no horizontal overflow | *capture yourself* |
-| 1366px layout screenshot | two-column fieldset grid | *capture yourself* |
+| 360px layout screenshot | single column, no horizontal overflow | `assets/layout-360.png` — re-shoot |
+| 1366px layout screenshot | two-column fieldset grid | `assets/layout-1366.png` — re-shoot |
 | Form completed with Tab / Shift+Tab / Enter only | every field reachable, submit works | *capture yourself* |
 | Focus visible on every control | outline never hidden | *capture yourself* |
 

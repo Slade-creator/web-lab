@@ -26,6 +26,7 @@ No AI-generated screenshots or invented test results are submitted.
 | 5 | 2026-09-21 | Task 2 — PUT /api/registrations/:id | Yes | Full-replace contract passes (200/404/400); restart wiped the memory store (the in-memory lesson); idempotent PUT evidenced by identical ETags |
 | 6 | 2026-09-21 | Task 2 + 1.3 — PATCH, DELETE, UI wiring | Yes | **AI-authored at our request (tired)**; all six routes + form→API flow tested and passing; explain-back checklist must be completed by both of us |
 | 7 | 2026-09-22 | Tasks 2.3, 3.1, 3.2, 4.1 — inspect route, caching, CORS toggle, cookie demo, docs | Yes | **AI-authored at our request**; AI verified every new route against a running server; we must re-run and capture our own evidence |
+| 8 | 2026-09-22 | Repository cleanup | Yes | Removed tooling artifacts, rescued our layout captures into `assets/`, deleted the unreferenced `app.ts`, corrected `package.json` |
 
 ## Entries
 
@@ -528,8 +529,9 @@ documentation step, not a re-test of the code.
    code matches our README decision. A marker may still ask about it.
 2. The demo cookie has no `Secure` flag because the lab runs on `http://localhost`.
    The README explains why, but we must be ready to say it out loud.
-3. `app.ts` still holds the old TypeScript draft from before the lab and is not
-   referenced by anything. AI did not delete it in case we still need it.
+3. `app.ts` held the old TypeScript draft from before the lab and was not
+   referenced by anything. AI did not delete it in case we still needed it — we
+   decided to delete it in Entry 8.
 
 **Explain-back checklist (BOTH of us, before submission):**
 
@@ -551,6 +553,52 @@ documentation step, not a re-test of the code.
 **What we learned:**
 
 - [Complete in your own words after walking the checklist.]
+
+---
+
+### Entry 8 — 2026-09-22 — Cleanup pass (AI-assisted)
+
+**Task / stage:** After Entry 7 we asked AI to tidy the repository. This is worth
+logging because it touched a file of ours and moved evidence.
+
+**Prompt (verbatim):**
+
+> can you do a clean up now
+
+**What AI found before deleting anything (it asked instead of assuming):**
+
+- `server.js` held **our own uncommitted comments** explaining the CORS, cache and
+  ETag decisions. AI left them untouched.
+- `.playwright-mcp/` — gitignored, therefore never submitted — held
+  `ict461-360.png` and `ict461-1366.png`, our Task 1.2 layout captures from 20-09.
+
+**Suggestion used:**
+
+- Delete the 15 regenerable Playwright artifacts (`page-*.yml`, `console-*.log`).
+- Move the two layout captures into `assets/` as `layout-360.png` and
+  `layout-1366.png` and link them from the README Task 1.2 evidence table.
+- Delete `app.ts`, the unreferenced pre-lab TypeScript draft.
+- Correct the `package.json` description, which still claimed TypeScript, and drop
+  the meaningless `main` field.
+- Commit our own `server.js` comments.
+
+**Suggestion rejected:**
+
+- AI offered to stop the background dev servers on ports 3000 and 5500. We kept
+  them running because we still need them to capture evidence.
+
+**Test / verification:**
+
+- `node -e "require('./package.json')"` parses — the description edit did not break it.
+- Re-requested `index.html`, `app.js`, `api.js` and `favicon.svg` from
+  `localhost:5500` — all `200` after `app.ts` was deleted, proving nothing imported it.
+- Searched the repo for `app.ts` and `TypeScript` — the only remaining hits were this
+  log, which we then updated.
+
+**What we learned:**
+
+- [Complete in your own words — the useful one: a gitignored tooling folder is a
+  trap for evidence, because the work is real but the file can never be submitted.]
 
 ---
 
@@ -621,7 +669,6 @@ must capture ourselves, plus the written work.
 **Git housekeeping**
 
 - [ ] Open an issue and record the peer review (lab submission requirement).
-- [ ] Decide whether `app.ts` (the old pre-lab draft, unreferenced) should be deleted.
 
 ## Statement
 
