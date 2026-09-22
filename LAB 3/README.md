@@ -1,4 +1,4 @@
-# ICT461 Lab 1 — Course Registration Portal
+# ICT461 Lab 3— Course Registration Portal
 
 Mulungushi University · School of Engineering and Technology · Department of
 Computer Science and IT — **ICT461 Web standards and HTTP fundamentals**
