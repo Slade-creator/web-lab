@@ -193,6 +193,32 @@ The JSON payload files (`body.json`, `body_put.json`, `body_patch.json`,
 `body_patch_empty.json`, `body_bad.json`) are committed as repeatable test
 fixtures.
 
+### The committed test fixtures
+
+Every payload below is a real file in the repository, so the tests are repeatable
+and a marker can run them without retyping JSON. PowerShell 5.1 splits inline JSON
+at spaces and eats quotes — we hit both, see `AI-use.md` Entry 4 — which is why
+these live in files and are sent with `-d "@file"`.
+
+| File | Contents | Used for | Expected result |
+|---|---|---|---|
+| `body.json` | `{"name":"Test Banda","studentId":"202309999","programme":"BSc Computer Science","courseName":"Cloud Computing"}` | `POST /api/registrations` | `201` + `Location` + the new record |
+| `body.json` sent again | the same file, unmodified | repeated `POST` — the idempotency question | `409` + `{"error":"Student already registered for the course"}` |
+| `body_bad.json` | `{"name":"No StudentId","programme":"BSc Computer Science","courseName":"Cloud Computing"}` | `POST` with `studentId` missing | `400` + `{"error":"invalid data"}` |
+| `body_put.json` | `{"name":"Test Banda Updated","studentId":"202309999","programme":"BSc Computer Science","courseName":"Cloud Computing"}` | `PUT /api/registrations/:id` | `200`, full replace; running it twice gives an identical ETag |
+| `body_patch.json` | `{"programme":"BSc Information Technology"}` | `PATCH /api/registrations/:id` | `200`, only `programme` changes, the other three fields untouched |
+| `body_patch_empty.json` | `{"programme":""}` | `PATCH` with an empty value | `400` + `{"error":"programme is required and cannot be empty"}` |
+
+Two things these fixtures deliberately demonstrate:
+
+- **`body_bad.json` is valid JSON carrying invalid data**, so it reaches our handler
+  and gets *our* JSON 400. It is not the malformed-JSON case: that one is rejected
+  earlier by Express's body parser with an HTML 400 (decision 2 above). To see the
+  second 400, send a body with unquoted keys such as `{name:Test Banda}`.
+- **`body_put.json` must contain all four fields.** PUT is a full replace, so a
+  partial body is a `400` rather than a partial update — partial updates are what
+  `PATCH` is for.
+
 ## Task 2.3 — the `/inspect` diagnostic route
 
 `/inspect` echoes what the server actually received, so `Accept` and
