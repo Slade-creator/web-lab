@@ -13,8 +13,6 @@ first attempt**. Every prompt, every suggestion we used or rejected, our test, a
 what we learned is logged below. All submitted code can be explained by either of us.
 No AI-generated screenshots or invented test results are submitted.
 
-If a task needed no AI involvement, it has no entry here (equivalent to "No AI used").
-
 ---
 
 ## Summary
@@ -27,6 +25,7 @@ If a task needed no AI involvement, it has no entry here (equivalent to "No AI u
 | 4 | 2026-09-21 | Task 2 — POST /api/registrations | Yes | 201 + Location, 409 duplicate, 400 invalid all pass; failures taught server restart, express.json() call parentheses, and PowerShell/cURL quoting boundaries |
 | 5 | 2026-09-21 | Task 2 — PUT /api/registrations/:id | Yes | Full-replace contract passes (200/404/400); restart wiped the memory store (the in-memory lesson); idempotent PUT evidenced by identical ETags |
 | 6 | 2026-09-21 | Task 2 + 1.3 — PATCH, DELETE, UI wiring | Yes | **AI-authored at our request (tired)**; all six routes + form→API flow tested and passing; explain-back checklist must be completed by both of us |
+| 7 | 2026-09-22 | Tasks 2.3, 3.1, 3.2, 4.1 — inspect route, caching, CORS toggle, cookie demo, docs | Yes | **AI-authored at our request**; AI verified every new route against a running server; we must re-run and capture our own evidence |
 
 ## Entries
 
@@ -445,6 +444,116 @@ full page reload                  → Programme field pre-filled from localStora
 
 ---
 
+### Entry 7 — 2026-09-22 — Tasks 2.3, 3.1, 3.2, 4.1 (AI-authored, disclosed)
+
+**Task / stage:** We had completed Task 1 and the six Task 2 routes, then asked AI
+to build the parts we had not reached: the `/inspect` diagnostic route, cache
+headers, a repeatable CORS failure, and the cookie demonstration. **AI wrote the
+code in this entry — it is NOT our first attempt.** Before submission both of us
+must work through the explain-back checklist below; if we cannot explain a line,
+we redo it ourselves.
+
+**Prompt (verbatim):**
+
+> can you work on whats missing
+
+(followed by three answers: restore the programme preference with a comment,
+commit in logical chunks, and add a small labelled cookie-demo panel)
+
+**What AI wrote (full disclosure):**
+
+- `server.js` — added `GET /inspect` (`app.all` with `express.json()`,
+  `express.urlencoded()` and `express.text()` parsers) echoing method, labelled URL
+  parts, headers, `Accept`, `Content-Type` and the parsed body; explicit
+  `ETag` + `Cache-Control: public, max-age=60` on `GET /api/courses` with an
+  `If-None-Match` → 304 branch; `Cache-Control: no-store` on
+  `/api/registrations` and `/api/demo`; env-driven CORS
+  (`UI_ORIGIN`, `CORS=off`) with `Access-Control-Allow-Credentials: true` and
+  `Vary: Origin`; the `POST`/`GET /api/demo/session` cookie routes plus a
+  dependency-free `parseCookies()`.
+- `app.js` — restored the `localStorage` programme preference (Task 1.3) as
+  `saveProgrammePreference()` / `restoreProgrammePreference()` wrapped in
+  `try/catch`, and wired the cookie-demo buttons.
+- `api.js` — `startDemoSession()` / `readDemoSession()` with
+  `credentials: "include"`.
+- `index.html`, `styles.css` — the labelled "Lab diagnostics — cookie demo"
+  section and its styles.
+- `favicon.svg` — closes the `/favicon.ico` 404 from Entry 6.
+- `body_patch.json`, `body_patch_empty.json` — the fixtures Entry 6 referenced but
+  never committed.
+- `README.md` — two-failures-per-route contract table, cache-header table, and the
+  experiment recipes for Tasks 2.3, 3.1, 3.2, 4.1, 4.2, 4.3 with empty "Observed"
+  columns for us to fill from our own runs.
+
+**Test / verification (real, run by AI today, repeatable by us):**
+
+AI ran the API and a browser against the working tree and recorded:
+
+```
+GET  /api/courses                     -> 200, ETag: "7ebf3336...", Cache-Control: public, max-age=60
+GET  /api/courses + If-None-Match     -> 304 Not Modified, no Content-Length
+GET  /api/registrations/reg_1         -> 200, Cache-Control: no-store
+POST /inspect (JSON)                  -> body echoed, contentType application/json
+POST /inspect (form data, ?q=..#frag) -> body echoed, accept text/html, fragment absent
+OPTIONS /api/registrations            -> 204 + Access-Control-Allow-* (CORS on)
+POST /api/registrations (CORS=off)    -> 201 for cURL, but NO Access-Control-Allow-Origin
+POST /api/demo/session                -> 200, Set-Cookie: demoSession=...; HttpOnly; SameSite=Lax; Path=/
+GET  /api/demo/session                -> {"received":"demo-..."} (cookie sent back)
+
+Browser (Playwright-driven, http://localhost:5500):
+form submit                           -> POST 201, dialog opened, "Registration saved as reg_3."
+programme after form.reset()          -> "BSc Computer Science" (restored)
+programme after full reload           -> "BSc Computer Science" (persisted)
+name/studentId/course after reload    -> all empty (only the programme is stored)
+cookie demo buttons                   -> Set-Cookie accepted, cookie sent back
+document.cookie                       -> "" (HttpOnly blocks JavaScript)
+console errors                        -> none (favicon 404 fixed)
+
+Browser with CORS=off:
+console                               -> "blocked by CORS policy: Response to preflight
+                                         request doesn't pass access control check: No
+                                         'Access-Control-Allow-Origin' header is present"
+request                               -> POST ... net::ERR_FAILED
+form feedback                         -> "Failed to fetch", button re-enabled (finally ran)
+```
+
+**Important:** the outputs above are AI's verification run, not our evidence. Every
+"Observed" cell in the README must be filled from **our own** runs — that is a
+documentation step, not a re-test of the code.
+
+**Issues AI flagged but did not change (ours to decide):**
+
+1. The `"reg_" + (registration.length + 1)` ID generator still collides after a
+   DELETE (Entry 6, issue 1). We labelled it design-only; AI left it alone so the
+   code matches our README decision. A marker may still ask about it.
+2. The demo cookie has no `Secure` flag because the lab runs on `http://localhost`.
+   The README explains why, but we must be ready to say it out loud.
+3. `app.ts` still holds the old TypeScript draft from before the lab and is not
+   referenced by anything. AI did not delete it in case we still need it.
+
+**Explain-back checklist (BOTH of us, before submission):**
+
+- [ ] `/inspect`: why `app.all` instead of `app.get`, and why three body parsers
+- [ ] `Accept` vs `Content-Type` — which one describes the request body
+- [ ] Why the `#fragment` never arrives at the server
+- [ ] How `jsonETag()` derives the tag from the data, and why not from a timestamp
+- [ ] `If-None-Match` → 304: why the 304 must have no body
+- [ ] Freshness (`max-age`) vs revalidation (`If-None-Match`) — what each avoids
+- [ ] Why `/api/registrations` and `/api/demo` get `no-store`
+- [ ] `CORS=off` failure: why cURL still succeeds where the browser blocks
+- [ ] Why `Access-Control-Allow-Origin: *` is illegal with
+      `Access-Control-Allow-Credentials: true`
+- [ ] `credentials: "include"` — what breaks if we remove it
+- [ ] `HttpOnly` vs `Secure` vs `SameSite` — one sentence each, no mixing them up
+- [ ] `try/catch` around `localStorage` — what failure it guards against
+- [ ] Why only the programme is persisted and not the other three fields
+
+**What we learned:**
+
+- [Complete in your own words after walking the checklist.]
+
+---
+
 ### Entry template (copy for each future AI interaction)
 
 ```
@@ -469,25 +578,50 @@ full page reload                  → Programme field pre-filled from localStora
 
 ---
 
-## TODO before submission (evidence we must capture ourselves)
+## TODO before submission
 
-- [ ] Rename Express skeleton `api.js` → `server.js`; commit (Task 2 prerequisite).
-- [ ] Build the `api.js` browser fetch helper and import it into `app.js` as a module
-      script (Task 1.3); log any AI use *after* our first attempt is committed.
-- [ ] Capture localStorage persistence after reload + explain sessionStorage difference
-      (Task 1.3) — our own screenshots, from our own run.
-- [ ] cURL the six routes and record method, route, body, status codes in README
-      (Task 2.1) — real terminal output only.
-- [ ] DevTools Network evidence: successful POST, invalid POST (400), duplicate POST
-      (409), missing record (404), plus "Copy as cURL" reproduction (Task 2.2).
-- [ ] ETag / Cache-Control / If-None-Match 304 vs 200 experiment (Task 3.1).
-- [ ] CORS failure → preflight OPTIONS → allowed origin success, browser vs cURL
-      comparison (Task 3.2).
-- [ ] Cookie route with HttpOnly / SameSite=Lax / Path=/ and Fetch `credentials:
-      "include"` (Task 4.1).
-- [ ] One Network waterfall before/after improvement under the same throttling preset
-      (Task 4.3).
-- [ ] Each partner: 100-word reflection on one mistake and how the fix was verified.
+Code is complete for Tasks 1, 2, 2.3, 3.1, 3.2 and 4.1. What remains is evidence we
+must capture ourselves, plus the written work.
+
+**Evidence to capture (our own runs only)**
+
+- [ ] Task 1.2 — 360px and 1366px layout screenshots; form completed with only
+      Tab / Shift+Tab / Enter; visible focus on every control.
+- [ ] Task 1.3 — reload screenshot showing Programme pre-filled and the other three
+      fields empty, plus our own sessionStorage comparison.
+- [ ] Task 2.2 — DevTools Network for successful POST, invalid POST (400), duplicate
+      POST (409) and missing record (404); "Copy as cURL" reproduction; proof the
+      form can be bypassed so server validation still runs.
+- [ ] Task 2.3 — `/inspect` JSON run, form-data run, Accept vs Content-Type, and the
+      `#fragment` absence.
+- [ ] Task 3.1 — `ETag` header, 304 with no body, changed-data 200 with a new ETag,
+      and `no-store` on registrations.
+- [ ] Task 3.2 — console failure and OPTIONS preflight with `CORS=off`, success with
+      CORS on, and the cURL-still-succeeds comparison.
+- [ ] Task 4.1 — `Set-Cookie`, stored cookie in Application ▸ Cookies, `Cookie` on the
+      later request, and `document.cookie` empty.
+- [ ] Task 4.2 — CSP / HSTS / X-Content-Type-Options / Referrer-Policy
+      present-or-absent table for one approved HTTPS site.
+- [ ] Task 4.3 — Network waterfall before and after under one throttling preset, with
+      bytes and duration; Protocol column.
+- [ ] Fill every "Observed" cell in README from those captures.
+
+**Written work**
+
+- [ ] Complete the "What we learned" placeholders in Entries 2–7 in our own words.
+- [ ] Walk both explain-back checklists (Entry 6 and Entry 7) and tick them.
+- [ ] Checkpoint A — browser → web server → application → data store sketch, where
+      validation belongs, and the HTML / ECMAScript / HTTP standards bodies.
+- [ ] Checkpoint B — predicted vs actual result for each experiment; swap keyboard
+      roles halfway through.
+- [ ] Each partner: 100-word reflection identifying our contribution, one mistake and
+      how we verified the fix.
+- [ ] Fill in the student names, repository URL and signatures at the top and bottom.
+
+**Git housekeeping**
+
+- [ ] Open an issue and record the peer review (lab submission requirement).
+- [ ] Decide whether `app.ts` (the old pre-lab draft, unreferenced) should be deleted.
 
 ## Statement
 
