@@ -1,4 +1,4 @@
-# ICT461 Lab 1: Course Registration Portal
+# ICT461 Lab 3— Course Registration Portal
 
 Mulungushi University · School of Engineering and Technology · Department of
 Computer Science and IT · **ICT461 Web standards and HTTP fundamentals**
@@ -289,6 +289,24 @@ Two things these fixtures show:
   partial body is a `400` rather than a partial update; partial updates are what
   `PATCH` is for.
 
+Captures of the four committed-payload runs, all with `curl.exe -i`:
+
+| Run | Expected | Captured |
+|---|---|---|
+| `POST` with `body.json`, sent twice | `201`, then `409` | `assets/api-post-409-conflict.png` — `409` + `{"error":"Student already registered for the course"}` |
+| `PUT` with `body_put.json` | `200`, full replace | `assets/api-put-200.png` — `200`, all four fields replaced |
+| `PATCH` with `body_patch.json` | `200`, only `programme` changes | `assets/api-patch-200.png` — `200`, only `programme` is `BSc Information Technology` |
+| `DELETE` | `204`, no body | `assets/api-delete-204.png` — `204 No Content`, nothing after the headers |
+
+![The repeat POST answers 409 Conflict](assets/api-post-409-conflict.png)
+
+![PUT replaces the whole record](assets/api-put-200.png)
+
+![PATCH changes only the programme](assets/api-patch-200.png)
+
+![DELETE answers 204 with no body](assets/api-delete-204.png)
+
+## Task 2.3 — the `/inspect` diagnostic route
 ## Task 2.3: the `/inspect` diagnostic route
 
 `/inspect` echoes what the server actually received, so `Accept` and
@@ -323,10 +341,14 @@ What to look for in the reply:
 
 | Check | Command | Observed |
 |---|---|---|
-| JSON body echoed | first command | *capture yourself* |
-| Form-data body echoed | second command | *capture yourself* |
-| `Accept` vs `Content-Type` differ | second command | *capture yourself* |
-| `#fragment` absent from the server's view | second command | *capture yourself* |
+| JSON body echoed | first command | `assets/inspect-json.png` — the body comes back verbatim under `body` |
+| Form-data body echoed | second command | `assets/inspect-formdata.png` — `name=Test Banda`, `programme=BSc CS` |
+| `Accept` vs `Content-Type` differ | second command | `assets/inspect-formdata.png` — `accept: text/html`, `contentType: application/x-www-form-urlencoded` |
+| `#fragment` absent from the server's view | second command | `assets/inspect-formdata.png` — `"fragment": "(absent — a browser never sends the #fragment)"` |
+
+![JSON body echoed by `/inspect`](assets/inspect-json.png)
+
+![Form-data body echoed by `/inspect`, with the fragment absent](assets/inspect-formdata.png)
 
 ## Task 3.1: caching with ETag, 304 and freshness
 
@@ -351,10 +373,16 @@ curl.exe -i -s http://localhost:3000/api/courses -H $header
 
 | Check | Expected | Observed |
 |---|---|---|
-| `GET /api/courses` headers | `ETag` + `Cache-Control: public, max-age=60` | *capture yourself* |
-| Same request with `If-None-Match` | 304, no `Content-Length`, no body | *capture yourself* |
+| `GET /api/courses` headers | `ETag` + `Cache-Control: public, max-age=60` | `assets/api-courses-headers.png` — `ETag: "7ebf333613c799996d72aafcb42d865e9b8b03c1"`, `Cache-Control: public, max-age=60` |
+| Same request with `If-None-Match` | 304, no `Content-Length`, no body | `assets/api-courses-etag-304.png` — `304 Not Modified`, headers only, no body |
 | Course data changed, then `If-None-Match` with the old tag | 200 + new ETag + new data | *capture yourself* |
-| `GET /api/registrations/reg_1` | `Cache-Control: no-store` | *capture yourself* |
+| `GET /api/registrations/reg_1` | `Cache-Control: no-store` | `assets/api-registration-no-store.png` — `Cache-Control: no-store` |
+
+![A fresh `GET /api/courses` carries its ETag and cache headers](assets/api-courses-headers.png)
+
+![Revalidation with `If-None-Match` answers 304 with no body](assets/api-courses-etag-304.png)
+
+![A registration response carries `Cache-Control: no-store`](assets/api-registration-no-store.png)
 
 ## Task 3.2: CORS, the failure and then the fix
 
@@ -386,10 +414,16 @@ Postman or any other client.
 
 | Check | Expected | Observed |
 |---|---|---|
-| Console error with `CORS=off` | blocked by CORS policy, no `Access-Control-Allow-Origin` | *capture yourself* |
+| Console error with `CORS=off` | blocked by CORS policy, no `Access-Control-Allow-Origin` | `assets/failed-fetch.png` — **re-shoot:** the capture shows `net::ERR_CONNECTION_REFUSED` (API unreachable), not the CORS-policy message; run it with `CORS=off` while the API is up |
 | Network: the `OPTIONS` preflight with `CORS=off` | present, 204, no `Access-Control-*` headers | *capture yourself* |
 | Console + Network with CORS on | POST 201, dialog opens | *capture yourself* |
 | Same POST via cURL with `CORS=off` | 201 Created, succeeds anyway | *capture yourself* |
+| Console + Network with CORS on | POST 201, dialog opens | `assets/form-success-dialog.png` — the POST succeeds and the success dialog opens |
+| Same POST via cURL with `CORS=off` | 201 Created — succeeds anyway | *capture yourself* |
+
+![Submission failure surfaced in the UI](assets/failed-fetch.png)
+
+![CORS on: the POST succeeds and the success dialog opens](assets/form-success-dialog.png)
 
 ## Task 4.1: cookie demonstration (not a login)
 
@@ -422,9 +456,13 @@ send it back on the next request. Without it the second call returns
 | Check | Where to look | Observed |
 |---|---|---|
 | `Set-Cookie` with `HttpOnly; SameSite=Lax; Path=/` | Network ▸ first request ▸ Response Headers | *capture yourself* |
-| Cookie stored | Application ▸ Cookies ▸ `http://localhost:3000` | *capture yourself* |
+| Cookie stored | Application ▸ Cookies ▸ `http://localhost:3000` | `assets/cookie-stored.png` — `demoSession` stored, `HttpOnly` ticked, `SameSite: Lax`, `Path: /` |
 | Cookie sent on the later request | Network ▸ second request ▸ Request Headers | *capture yourself* |
 | `document.cookie` does **not** expose it | Console | *capture yourself* |
+
+![The demo cookie stored with `HttpOnly` and `SameSite=Lax`](assets/cookie-stored.png)
+
+![The demo cookie stored with `HttpOnly` and `SameSite=Lax`](assets/cookie-stored.png)
 
 ## Task 4.2: security reading
 
@@ -515,7 +553,7 @@ before submission**; the submitted screenshots must match the submitted code.
 | Form completed with Tab / Shift+Tab / Enter only | every field reachable, submit works | *capture yourself* |
 | Focus visible on every control | outline never hidden | *capture yourself* |
 
-![Registration form](assets/form.png)
+![Successful registration — the confirmation dialog](assets/form-success-dialog.png)
 
 ## Evidence and AI usage
 
