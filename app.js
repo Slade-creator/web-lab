@@ -7,6 +7,7 @@ const dialogClose = document.getElementById("dialogClose");
 const feedback = document.getElementById("formFeedback");
 const submitButton = form.querySelector("button[type='submit']");
 
+// Task 1.3: only the programme survives a reload; the other fields stay empty.
 const PROGRAMME_KEY = "preferredProgramme";
 
 function getInputValue(id) {
@@ -27,7 +28,7 @@ function saveProgrammePreference(programme) {
     try {
         localStorage.setItem(PROGRAMME_KEY, programme);
     } catch {
-        return;
+        return; // storage can be unavailable (private mode, full quota) — ignore it
     }
 }
 
@@ -38,7 +39,7 @@ function restoreProgrammePreference() {
             document.getElementById("program").value = saved;
         }
     } catch {
-        return;
+        return; // no storage: leave the field as the user left it
     }
 }
 
@@ -46,8 +47,9 @@ function restoreProgrammePreference() {
 restoreProgrammePreference();
 
 form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // fetch does the submit, so stop the full page navigation
 
+    // Form field ids differ from the API names: program -> programme, course -> courseName.
     const reg = {
         name: getInputValue("name"),
         studentId: getInputValue("StudentId"),
@@ -64,7 +66,7 @@ form.addEventListener("submit", async (e) => {
         dialogText.textContent = `Course ${saved.courseName} added for ${saved.name}!`;
         dialog.showModal();
         form.reset();
-        restoreProgrammePreference();
+        restoreProgrammePreference(); // reset() cleared the field — put the saved programme back
         showFeedback(`Registration saved as ${saved.id}.`, false);
     } catch (err) {
         showFeedback(err.message, true);
@@ -79,6 +81,7 @@ const cookieSetButton = document.getElementById("cookieSet");
 const cookieReadButton = document.getElementById("cookieRead");
 const cookieOutput = document.getElementById("cookieOutput");
 
+// Both diagnostics buttons share this: lock the button, run the request, print the raw reply.
 async function runCookieStep(button, action) {
     button.disabled = true;
     cookieOutput.textContent = "Working...";

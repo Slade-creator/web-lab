@@ -12,13 +12,14 @@ const MIME = {
 };
 
 const PORT = 5500;
-const root = __dirname;
+const root = __dirname; // everything in this folder is public
 
 http.createServer((req, res) => {
+    // Strip query and fragment, then decode %20-style escapes before mapping to a file.
     const urlPath = decodeURIComponent(req.url.split("?")[0].split("#")[0]);
     const filePath = path.join(root, urlPath === "/" ? "index.html" : urlPath);
 
-    if (!filePath.startsWith(root)) {
+    if (!filePath.startsWith(root)) { // path traversal guard: refuse anything outside the folder
         res.writeHead(403);
         res.end("Forbidden");
         return;
@@ -30,6 +31,7 @@ http.createServer((req, res) => {
             res.end("Not found");
             return;
         }
+        // Unknown extensions download as bytes instead of being rendered as HTML.
         const type = MIME[path.extname(filePath).toLowerCase()] || "application/octet-stream";
         res.writeHead(200, { "Content-Type": type });
         res.end(data);
