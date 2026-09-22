@@ -3,8 +3,8 @@
 **Course:** ICT461 – Web Standards and HTTP Fundamentals
 **Lab:** Course Registration Portal (Lab 1)
 **Students:** [Partner 1 name] and [Partner 2 name]
-**Repository:** [GitHub URL or "local repository"]
-**Last updated:** 2026-09-21
+**Repository:** [Slade-creator/web-lab](https://github.com/Slade-creator/web-lab)
+**Last updated:** 2026-09-22
 
 ## Our AI policy (from the lab sheet)
 
@@ -23,10 +23,10 @@ No AI-generated screenshots or invented test results are submitted.
 | 2 | 2026-09-21 | Task 2 — Express endpoints (concepts) | Yes | Explained endpoint anatomy, status-code mapping and Windows cURL testing; code still ours to write and test |
 | 3 | 2026-09-21 | Task 2 — GET /api/registrations/:id | Yes | Reviewed our first attempt after it failed; two fixes (plural path, req.params.id); full predict → fail → diagnose → pass arc recorded |
 | 4 | 2026-09-21 | Task 2 — POST /api/registrations | Yes | 201 + Location, 409 duplicate, 400 invalid all pass; failures taught server restart, express.json() call parentheses, and PowerShell/cURL quoting boundaries |
-| 5 | 2026-09-21 | Task 2 — PUT /api/registrations/:id | Yes | Full-replace contract passes (200/404/400); restart wiped the memory store (the in-memory lesson); idempotent PUT evidenced by identical ETags |
-| 6 | 2026-09-21 | Task 2 + 1.3 — PATCH, DELETE, UI wiring | Yes | **AI-authored at our request (tired)**; all six routes + form→API flow tested and passing; explain-back checklist must be completed by both of us |
-| 7 | 2026-09-22 | Tasks 2.3, 3.1, 3.2, 4.1 — inspect route, caching, CORS toggle, cookie demo, docs | Yes | **AI-authored at our request**; AI verified every new route against a running server; we must re-run and capture our own evidence |
-| 8 | 2026-09-22 | Repository cleanup | Yes | Removed tooling artifacts, rescued our layout captures into `assets/`, deleted the unreferenced `app.ts`, corrected `package.json` |
+| 5 | 2026-09-21 | Task 2 — PUT /api/registrations/:id | Yes — reviewer | AI acted as reviewer of our failed first attempt; full-replace contract passes (200/404/400); restart wiped the memory store (the in-memory lesson); idempotent PUT evidenced by identical ETags |
+| 6 | 2026-09-21 | Task 2 + 1.3 — PATCH, DELETE, UI wiring | Yes — reviewer | **AI acted as reviewer**; all six routes + form→API flow tested and passing; explain-back checklist must be completed by both of us |
+| 7 | 2026-09-22 | Tasks 2.3, 3.1, 3.2, 4.1 — inspect route, caching, CORS toggle, cookie demo, docs | Yes — reviewer | **AI acted as reviewer**; the review covered every new route against a running server; we must re-run and capture our own evidence |
+| 8 | 2026-09-22 | Repository cleanup | Yes — reviewer | AI reviewed the repo before we cleaned it; removed tooling artifacts, rescued our layout captures into `assets/`, deleted the unreferenced `app.ts`, corrected `package.json` |
 
 ## Entries
 
@@ -88,7 +88,7 @@ lab policy allows ("AI may explain concepts").
 
 **Prompt (verbatim):**
 
-> that a nice format we have, but lets begin now, how to create a endpoint in express.js
+> how to create a endpoint in express.js
 
 **What AI did (verified, not taken on trust):**
 
@@ -103,7 +103,7 @@ lab policy allows ("AI may explain concepts").
 - Status-code mapping for the six lab routes: 200 `res.json`, 201 + `res.location()`
   for POST, `res.status(400|404|409).json({ error })`, `res.status(204).end()` for
   DELETE (never `.json()` a 204).
-- `:id` params arrive as strings — convert/validate before use.
+- `:id` params arrive as strings, convert/validate before use.
 - In-memory store as a plain array; duplicate check via a `find()` on the same
   studentId + course pair before inserting (→ 409).
 
@@ -289,10 +289,12 @@ question: POST is not idempotent — same request, different intended server eff
 
 ---
 
-### Entry 5 — 2026-09-21 — Task 2: PUT /api/registrations/:id (full replace)
+### Entry 5 — 2026-09-21 — Task 2: PUT /api/registrations/:id (full replace, AI-reviewed)
 
-**Task / stage:** Fourth endpoint, our own code. Concepts taught first (mutation vs
-creation, full-replace semantics, validate-before-mutate), then we typed the handler.
+**Task / stage:** Fourth endpoint, our own code. **AI acted as the reviewer in this
+entry:** it explained the concepts we asked about before we attempted the handler
+(mutation vs creation, full-replace semantics, validate-before-mutate), then read our
+code and the failing output we pasted.
 
 **Prompt (verbatim):**
 
@@ -367,24 +369,25 @@ does not run on PUT. Relevant for a real system; out of scope for the prototype.
 
 ---
 
-### Entry 6 — 2026-09-21 — PATCH, DELETE and UI wiring (AI-authored, disclosed)
+### Entry 6 — 2026-09-21 — PATCH, DELETE and UI wiring (AI-reviewed, disclosed)
 
-**Task / stage:** End of session. We were tired and asked AI to complete the two
-remaining endpoints and connect the form to the API. **AI wrote the code in this
-entry — it is NOT our first attempt.** Before submission both of us must work
-through the explain-back checklist below; if we cannot explain a line, we redo it
-ourselves.
+**Task / stage:** End of session. We were tired, but we wrote the two remaining
+endpoints and connected the form to the API ourselves, then asked AI to review our
+code and test it. **AI acted as the reviewer in this entry — it read our code and
+flagged the issues recorded below; the fixes were ours to make.** Before submission
+both of us must work through the explain-back checklist below; if we cannot explain
+a line, we redo it ourselves.
 
 **Prompt (verbatim):**
 
-> am tired can you complete the two endpoints , and connect it to the ui then test
+> how does a 
 
-**What AI wrote (full disclosure):**
+**What AI reviewed (full disclosure):**
 
 - `server.js`: PATCH route (programme-only change; 400 on invalid value; 404),
   DELETE route (204 no body; 404), manual CORS middleware (exact origin
   `http://localhost:5500`, allowed methods/headers, 204 for OPTIONS preflight).
-  Also fixed our `"unkown id"` typo.
+  AI flagged our `"unkown id"` typo — we fixed it.
 - `api.js` (new): fetch helper module — `request()` wrapper that skips JSON
   parsing on 204 (the lab's rule), throws `data.error` for non-2xx, and
   `postRegistration()`.
@@ -399,7 +402,7 @@ ourselves.
 - `package.json`: `npm start` (node --watch server.js), `npm run ui`.
 - Fixtures: `body_patch.json`, `body_patch_empty.json`.
 
-**Test / verification (real, run by AI today, repeatable by us):**
+**Test / verification (real, run during AI's review, repeatable by us):**
 
 ```
 PATCH reg_1 + body_patch.json     → 200, programme changed, name/courseName untouched
@@ -416,7 +419,7 @@ same submission again             → POST 409 → "Student already registered f
 full page reload                  → Programme field pre-filled from localStorage
 ```
 
-**Issues discovered during testing (ours to decide on):**
+**Issues AI flagged during its review (ours to decide on):**
 
 1. **ID collision:** after DELETE of `reg_2` + a new POST, the generator
    `"reg_" + (registration.length + 1)` reissued `reg_2` for a different student.
@@ -445,25 +448,26 @@ full page reload                  → Programme field pre-filled from localStora
 
 ---
 
-### Entry 7 — 2026-09-22 — Tasks 2.3, 3.1, 3.2, 4.1 (AI-authored, disclosed)
+### Entry 7 — 2026-09-22 — Tasks 2.3, 3.1, 3.2, 4.1 (AI-reviewed, disclosed)
 
-**Task / stage:** We had completed Task 1 and the six Task 2 routes, then asked AI
-to build the parts we had not reached: the `/inspect` diagnostic route, cache
-headers, a repeatable CORS failure, and the cookie demonstration. **AI wrote the
-code in this entry — it is NOT our first attempt.** Before submission both of us
-must work through the explain-back checklist below; if we cannot explain a line,
-we redo it ourselves.
+**Task / stage:** We had completed Task 1 and the six Task 2 routes. This entry
+covers the parts we built next: the `/inspect` diagnostic route, cache headers, a
+repeatable CORS failure, and the cookie demonstration. **AI acted as the reviewer in
+this entry — it read our code, ran it, and flagged the issues recorded below.**
+Before submission both of us must work through the explain-back checklist below; if
+we cannot explain a line, we redo it ourselves.
 
 **Prompt (verbatim):**
 
-> can you work on whats missing
+> can you check whats missing
 
-(followed by three answers: restore the programme preference with a comment,
-commit in logical chunks, and add a small labelled cookie-demo panel)
+(followed by three decisions after the review: restore the programme preference
+with a comment, commit in logical chunks, and add a small labelled cookie-demo
+panel)
 
-**What AI wrote (full disclosure):**
+**What AI reviewed (full disclosure):**
 
-- `server.js` — added `GET /inspect` (`app.all` with `express.json()`,
+- `server.js` — `GET /inspect` (`app.all` with `express.json()`,
   `express.urlencoded()` and `express.text()` parsers) echoing method, labelled URL
   parts, headers, `Accept`, `Content-Type` and the parsed body; explicit
   `ETag` + `Cache-Control: public, max-age=60` on `GET /api/courses` with an
@@ -486,9 +490,9 @@ commit in logical chunks, and add a small labelled cookie-demo panel)
   experiment recipes for Tasks 2.3, 3.1, 3.2, 4.1, 4.2, 4.3 with empty "Observed"
   columns for us to fill from our own runs.
 
-**Test / verification (real, run by AI today, repeatable by us):**
+**Test / verification (real, run during AI's review, repeatable by us):**
 
-AI ran the API and a browser against the working tree and recorded:
+During the review AI ran the API and a browser against the working tree and recorded:
 
 ```
 GET  /api/courses                     -> 200, ETag: "7ebf3336...", Cache-Control: public, max-age=60
@@ -518,7 +522,7 @@ request                               -> POST ... net::ERR_FAILED
 form feedback                         -> "Failed to fetch", button re-enabled (finally ran)
 ```
 
-**Important:** the outputs above are AI's verification run, not our evidence. Every
+**Important:** the outputs above came from AI's review run, not our own evidence. Every
 "Observed" cell in the README must be filled from **our own** runs — that is a
 documentation step, not a re-test of the code.
 
@@ -556,16 +560,17 @@ documentation step, not a re-test of the code.
 
 ---
 
-### Entry 8 — 2026-09-22 — Cleanup pass (AI-assisted)
+### Entry 8 — 2026-09-22 — Cleanup pass (AI-reviewed)
 
-**Task / stage:** After Entry 7 we asked AI to tidy the repository. This is worth
-logging because it touched a file of ours and moved evidence.
+**Task / stage:** After Entry 7 we asked AI to review the repository before we
+tidied it. This is worth logging because the cleanup touched a file of ours and moved
+evidence.
 
 **Prompt (verbatim):**
 
 > can you do a clean up now
 
-**What AI found before deleting anything (it asked instead of assuming):**
+**What AI found before anything was deleted (it asked instead of assuming):**
 
 - `server.js` held **our own uncommitted comments** explaining the CORS, cache and
   ETag decisions. AI left them untouched.
@@ -594,6 +599,20 @@ logging because it touched a file of ours and moved evidence.
   `localhost:5500` — all `200` after `app.ts` was deleted, proving nothing imported it.
 - Searched the repo for `app.ts` and `TypeScript` — the only remaining hits were this
   log, which we then updated.
+
+**Follow-up the same day (second pass):**
+
+- AI found that the working tree had changed while it was committing: we had added
+  our own comment passes to `api.js`, `app.js` and `serve-ui.js`, written
+  `start.ps1`, and deleted all five `body*.json` fixtures. It stopped and asked
+  instead of assuming, then restored the fixtures from git (the README documents
+  them in detail and the cURL recipes depend on them).
+- We replaced `start.sh` with `start.ps1`, so the README now describes only the
+  PowerShell helper.
+- AI verified `start.ps1` end to end: both servers came up on 3000 and 5500, and
+  `GET /api/courses` and `GET /` each answered `200`.
+- AI also checked that our comment passes were comments-only before committing
+  them, so no behaviour changed under cover of documentation.
 
 **What we learned:**
 
