@@ -28,6 +28,8 @@ observed ourselves: every restart wipes all registrations (documented in
 
 Requirements: Node.js 18.11+ (for `node --watch`) and Git.
 
+Two terminals, one process each:
+
 ```powershell
 npm install
 
@@ -37,6 +39,18 @@ npm start
 # terminal 2 — the interface on port 5500
 npm run ui
 ```
+
+Or start both in one window with the helper script:
+
+```powershell
+.\start.ps1     # Windows PowerShell
+# blocked by the execution policy? run:
+powershell -ExecutionPolicy Bypass -File .\start.ps1
+```
+
+Ctrl+C stops both. The script runs the same two `node` commands directly, without
+`--watch`; keep `npm start` + `npm run ui` when you want the API to restart on
+save.
 
 Then open **http://localhost:5500**. Submitting the form sends a `POST` to the
 API; success opens a dialog, server-side errors (400/409) are shown as visible
@@ -470,6 +484,7 @@ before submission** — the submitted screenshots must match the submitted code.
 | `api.js` | Client fetch helper module (skips JSON parsing on 204, cookie helpers) |
 | `server.js` | Express API — six routes, `/inspect`, cookie demo, CORS middleware, cache headers |
 | `serve-ui.js` | Dependency-free static server for port 5500 |
+| `start.ps1` | Helper: starts the API and the UI together, stops both on Ctrl+C |
 | `favicon.svg` | Site icon (removes the `/favicon.ico` 404) |
 | `body*.json` | Manual test payloads for cURL |
 | `AI-use.md` | AI usage log (lab requirement) |
