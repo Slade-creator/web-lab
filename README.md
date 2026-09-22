@@ -50,7 +50,8 @@ powershell -ExecutionPolicy Bypass -File .\start.ps1
 
 Ctrl+C stops both. The script runs the same two `node` commands directly, without
 `--watch`; keep `npm start` + `npm run ui` when you want the API to restart on
-save.
+save. If a port is already busy it stops with a message instead of starting half
+the stack; `.\start.ps1 -Force` replaces whatever is on ports 3000/5500.
 
 Then open **http://localhost:5500**. Submitting the form sends a `POST` to the
 API; success opens a dialog, server-side errors (400/409) are shown as visible
