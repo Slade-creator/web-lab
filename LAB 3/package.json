@@ -1,0 +1,25 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "ICT461 Lab 1 — course registration portal: semantic HTML, CSS and vanilla JavaScript talking to an Express JSON API over Fetch. Built as a lab exercise in web standards and HTTP fundamentals.",
+  "scripts": {
+    "start": "node --watch server.js",
+    "ui": "node serve-ui.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slade-creator/web-lab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Slade-creator/web-lab/issues"
+  },
+  "homepage": "https://github.com/Slade-creator/web-lab#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

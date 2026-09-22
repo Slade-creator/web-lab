@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        
+            <header class="container">
+                <h1>Course Registration</h1>
+                <p>Fill in your details to register for a course</p>
+
+                <nav aria-label="Main">
+                    <ul>
+                        <li><a href="#register">Register</a></li>
+                    </ul>
+                </nav>
+            </header>
+
+            <main class="container">
+            <section id="register" tabindex="-1" aria-labelledby="register-heading">
+                <h2 id="register-heading">Register for a Course</h2>
+                <form id="regForm">
+                    <fieldset>
+                        <legend>Student Details</legend>
+                    <div>
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required autocomplete="name" placeholder="e.g. Alex Banda">
+                    </div>
+                    <div>
+                        <label for="StudentId">Student ID:</label>
+                        <input type="text" id="StudentId" name="StudentId" required placeholder="e.g. STU-2024-001">
+                    </div>
+                    <div>
+                        <label for="program">Programme:</label>
+                        <input type="text" id="program" name="program" required placeholder="e.g. BSc Computer Science">
+                    </div>
+                    <div>
+                        <label for="course">Course name:</label>
+                        <input type="text" id="course" name="course" required placeholder="e.g. Web Development">
+                    </div>
+                    </fieldset>
+
+                    <button type="submit">Submit</button>
+                    <p id="formFeedback" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <section id="diagnostics" aria-labelledby="diagnostics-heading">
+                <h2 id="diagnostics-heading">Lab diagnostics — cookie demo</h2>
+                <p>Not a login system. Sets a non-sensitive <code>demoSession</code> cookie, then sends it
+                   back. Watch both requests in DevTools ▸ Network, and the stored cookie in
+                   Application ▸ Cookies.</p>
+                <div class="diagnostics-actions">
+                    <button type="button" id="cookieSet">1. Set demo cookie</button>
+                    <button type="button" id="cookieRead">2. Send it back</button>
+                </div>
+                <pre id="cookieOutput" role="status" aria-live="polite">No request sent yet.</pre>
+            </section>
+        </main>
+
+        <footer class="container">
+            <p>Mulungushi University · Department of Computer Science</p>
+        </footer>
+
+        <dialog id="successDialog" closedby="any" aria-labelledby="dialogTitle" aria-describedby="dialogText">
+            <div class="dialog-body">
+                <svg class="check-mark" viewBox="0 0 52 52" width="72" height="72" aria-hidden="true">
+                    <circle class="check-mark-circle" cx="26" cy="26" r="24" fill="none"/>
+                    <path class="check-mark-tick" fill="none" d="M14 27l8 8 16-17"/>
+                </svg>
+                <h2 id="dialogTitle">Success!</h2>
+                <p id="dialogText"></p>
+                <button type="button" id="dialogClose" class="dialog-btn" autofocus>Great, continue</button>
+            </div>
+        </dialog>
+        
+        <script type="module" src="app.js"></script>
+    </body>
+</html>

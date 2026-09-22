@@ -1,0 +1,12 @@
+# Dependencies (installed from package.json + lockfile)
+node_modules/
+
+# Playwright MCP test artifacts — tooling output, not source or evidence
+.playwright-mcp/
+
+# Logs
+*.log
+
+# OS cruft
+.DS_Store
+Thumbs.db
