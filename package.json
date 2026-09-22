@@ -1,8 +1,7 @@
 {
   "name": "web",
   "version": "1.0.0",
-  "description": "A simple course registration page built with plain HTML, CSS, and TypeScript. Created as a lab exercise in web fundamentals.",
-  "main": "app.js",
+  "description": "ICT461 Lab 1 — course registration portal: semantic HTML, CSS and vanilla JavaScript talking to an Express JSON API over Fetch. Built as a lab exercise in web standards and HTTP fundamentals.",
   "scripts": {
     "start": "node --watch server.js",
     "ui": "node serve-ui.js",
