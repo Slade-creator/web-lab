@@ -1,8 +1,8 @@
 # AI-use.md - AI usage log
 
 **Course:** ICT461 - Web Standards and HTTP Fundamentals
-**Lab:** Course Registration Portal (Lab 1)
-**Group:** [Group name]
+**Lab:** Course Registration Portal (Lab 3)
+**Group:** GROUP D
 **Repository:** [Slade-creator/web-lab](https://github.com/Slade-creator/web-lab)
 
 ## Our AI policy (from the lab sheet)
@@ -688,4 +688,4 @@ We confirm that every entry above is accurate, that all submitted code can be
 explained by both of us, and that all screenshots and test results were produced by
 us during our own runs.
 
-Signed: [Group name]
+Signed: GROUP D
